@@ -16,7 +16,7 @@ public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest> where T
     {
         var requestName = typeof(TRequest).Name;
 
-        _logger.LogInformation("Minimal API Request: {Name} {@Request}", requestName, request);
+        _logger.LogInformation("Lyrics API Request: {Name} {@Request}", requestName, request);
 
         return Task.CompletedTask;
     }

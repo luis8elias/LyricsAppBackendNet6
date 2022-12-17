@@ -1,6 +1,7 @@
 ﻿using Carter;
 using Carter.ModelBinding;
 using FluentValidation;
+using LyricsApp.Application.Common.Filters;
 using LyricsApp.Application.Common.Models;
 using LyricsApp.Application.Domain.Entities;
 using LyricsApp.Application.Features.Categories.Queries;
@@ -20,19 +21,18 @@ namespace LyricsApp.Application.Features.Tags.Commands
         public void AddRoutes(IEndpointRouteBuilder app)
         {
 
-            app.MapPost("api/tags", async (HttpRequest req, IMediator mediator, CreateTagCommand command) =>
+            app.MapPost("api/tags", async (CreateTagCommand command, IMediator mediator) =>
             {
                 return await mediator.Send(command);
             })
-
             .WithName(nameof(CreateTag))
             .WithTags(nameof(Tag))
             .ProducesValidationProblem()
             .Produces(
                 StatusCodes.Status201Created,
                 typeof(BasicResponse<int>)
-             );
-
+            )
+            .AddEndpointFilter<ValidationFilter<CreateTagCommand>>();
         }
     }
 
@@ -63,20 +63,14 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
         public async Task<IResult> Handle(CreateTagCommand request, CancellationToken cancellationToken)
         {
-            var result = _validator.Validate(request);
-            if (!result.IsValid)
-            {
-                var errs = result.GetValidationProblems();
-
-                return Results.BadRequest(errs);
-
-            }
-
             try
             {
                 var newTag = new Tag(0, request.Name);
+                
                 _context.Tags.Add(newTag);
+
                 await _context.SaveChangesAsync(cancellationToken);
+                
                 return Results.CreatedAtRoute(nameof(GetTagDetails), new { newTag.Id },
                     new BasicResponse<Tag>(true, "Tag creado correctamente", newTag));
 
