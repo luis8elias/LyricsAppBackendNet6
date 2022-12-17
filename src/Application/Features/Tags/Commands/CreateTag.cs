@@ -71,7 +71,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
                 await _context.SaveChangesAsync(cancellationToken);
                 
-                return Results.CreatedAtRoute(nameof(GetTagDetails), new { newTag.Id },
+                return Results.CreatedAtRoute(nameof(CreateTag), new { newTag.Id },
                     new BasicResponse<Tag>(true, "Tag creado correctamente", newTag));
 
             }

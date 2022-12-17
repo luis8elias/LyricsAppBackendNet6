@@ -21,11 +21,11 @@ namespace LyricsApp.Api
     public partial interface IClient
     {
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BasicResponseOfTag> GetTagDetailsAsync(int id);
+        System.Threading.Tasks.Task<BasicResponseOfTag> GetTagByIdAsync(int id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<BasicResponseOfTag> GetTagDetailsAsync(int id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<BasicResponseOfTag> GetTagByIdAsync(int id, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<BasicResponseOfListOfGetTagsResponse> GetTagsAsync();
@@ -79,14 +79,14 @@ namespace LyricsApp.Api
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<BasicResponseOfTag> GetTagDetailsAsync(int id)
+        public virtual System.Threading.Tasks.Task<BasicResponseOfTag> GetTagByIdAsync(int id)
         {
-            return GetTagDetailsAsync(id, System.Threading.CancellationToken.None);
+            return GetTagByIdAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<BasicResponseOfTag> GetTagDetailsAsync(int id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<BasicResponseOfTag> GetTagByIdAsync(int id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");

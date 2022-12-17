@@ -11,7 +11,7 @@
         "tags": [
           "Tag"
         ],
-        "operationId": "GetTagDetails",
+        "operationId": "GetTagById",
         "parameters": [
           {
             "name": "id",

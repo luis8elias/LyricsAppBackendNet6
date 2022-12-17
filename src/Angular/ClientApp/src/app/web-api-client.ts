@@ -16,7 +16,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IClient {
-    getTagDetails(id: number): Observable<BasicResponseOfTag>;
+    getTagById(id: number): Observable<BasicResponseOfTag>;
     getTags(): Observable<BasicResponseOfListOfGetTagsResponse>;
     createTag(command: CreateTagCommand): Observable<BasicResponseOfInteger>;
 }
@@ -34,7 +34,7 @@ export class Client implements IClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
     }
 
-    getTagDetails(id: number): Observable<BasicResponseOfTag> {
+    getTagById(id: number): Observable<BasicResponseOfTag> {
         let url_ = this.baseUrl + "/api/tags/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -50,11 +50,11 @@ export class Client implements IClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetTagDetails(response_);
+            return this.processGetTagById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetTagDetails(response_ as any);
+                    return this.processGetTagById(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<BasicResponseOfTag>;
                 }
@@ -63,7 +63,7 @@ export class Client implements IClient {
         }));
     }
 
-    protected processGetTagDetails(response: HttpResponseBase): Observable<BasicResponseOfTag> {
+    protected processGetTagById(response: HttpResponseBase): Observable<BasicResponseOfTag> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
