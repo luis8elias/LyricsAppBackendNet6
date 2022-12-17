@@ -6,6 +6,38 @@
     "version": "v1"
   },
   "paths": {
+    "/api/tags/{id}": {
+      "get": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "GetTagDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponseOfTag"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tags": {
       "get": {
         "tags": [
@@ -44,16 +76,6 @@
           "x-position": 1
         },
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BasicResponseOfNullableInteger"
-                }
-              }
-            }
-          },
           "400": {
             "description": "",
             "content": {
@@ -80,6 +102,40 @@
   },
   "components": {
     "schemas": {
+      "BasicResponseOfTag": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Tag"
+              }
+            ]
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "BasicResponseOfListOfGetTagsResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -115,24 +171,6 @@
           },
           "name": {
             "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "BasicResponseOfNullableInteger": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "data": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           }
         }

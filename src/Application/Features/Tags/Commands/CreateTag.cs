@@ -3,7 +3,7 @@ using Carter.ModelBinding;
 using FluentValidation;
 using LyricsApp.Application.Common.Models;
 using LyricsApp.Application.Domain.Entities;
-
+using LyricsApp.Application.Features.Categories.Queries;
 using LyricsApp.Application.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -19,12 +19,12 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-           
+
             app.MapPost("api/tags", async (HttpRequest req, IMediator mediator, CreateTagCommand command) =>
             {
                 return await mediator.Send(command);
             })
-              
+
             .WithName(nameof(CreateTag))
             .WithTags(nameof(Tag))
             .ProducesValidationProblem()
@@ -32,14 +32,14 @@ namespace LyricsApp.Application.Features.Tags.Commands
                 StatusCodes.Status201Created,
                 typeof(BasicResponse<int>)
              );
-           
+
         }
     }
 
-    public class CreateTagCommand : IRequest<BasicResponse<int?>>
+    public class CreateTagCommand : IRequest<IResult>
     {
         public string Name { get; set; } = string.Empty;
-      
+
     }
 
     public class CreateTagValidator : AbstractValidator<CreateTagCommand>
@@ -50,7 +50,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
         }
     }
 
-    public class CreateTagHandler : IRequestHandler<CreateTagCommand, BasicResponse<int?>>
+    public class CreateTagHandler : IRequestHandler<CreateTagCommand, IResult>
     {
         private readonly ApiDbContext _context;
         private readonly IValidator<CreateTagCommand> _validator;
@@ -61,34 +61,31 @@ namespace LyricsApp.Application.Features.Tags.Commands
             _validator = validator;
         }
 
-        public async Task<BasicResponse<int?>> Handle(CreateTagCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(CreateTagCommand request, CancellationToken cancellationToken)
         {
             var result = _validator.Validate(request);
             if (!result.IsValid)
             {
                 var errs = result.GetValidationProblems();
-                return new BasicResponse<int?>(false, "Tag no creado", null);
-               
+
+                return Results.BadRequest(errs);
+
             }
 
             try
             {
                 var newTag = new Tag(0, request.Name);
                 _context.Tags.Add(newTag);
-                await _context.SaveChangesAsync();
-                return new BasicResponse<int?>(true, "Tag creado correctamente", newTag.Id);
+                await _context.SaveChangesAsync(cancellationToken);
+                return Results.CreatedAtRoute(nameof(GetTagDetails), new { newTag.Id },
+                    new BasicResponse<Tag>(true, "Tag creado correctamente", newTag));
 
             }
             catch (Exception)
             {
-                return new BasicResponse<int?>(false, "Tag no creado", null);
-                
+                return Results.BadRequest(new BasicResponse<int?>(false, "Tag no creado", null));
+
             }
-
-
-
-            
-
         }
     }
 }
