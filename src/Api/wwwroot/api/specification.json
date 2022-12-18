@@ -6,7 +6,7 @@
     "version": "v1"
   },
   "paths": {
-    "/api/tags/{id}": {
+    "/api/tags/{tagId}": {
       "get": {
         "tags": [
           "Tag"
@@ -14,7 +14,7 @@
         "operationId": "GetTagById",
         "parameters": [
           {
-            "name": "id",
+            "name": "tagId",
             "in": "path",
             "required": true,
             "schema": {
@@ -31,6 +31,62 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BasicResponseOfTag"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponse_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "DeleteTag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponse_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponse_1"
                 }
               }
             }
@@ -54,6 +110,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": ""
           }
         }
       },
@@ -92,6 +151,53 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BasicResponseOfInteger"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "UpdateTag",
+        "requestBody": {
+          "x-name": "command",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponseOfTag"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -178,6 +284,31 @@
             "type": "string"
           }
         }
+      },
+      "BasicResponse_1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Data": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/T"
+              }
+            ]
+          }
+        }
+      },
+      "T": {
+        "type": "object",
+        "additionalProperties": false
       },
       "BasicResponseOfListOfGetTagsResponse": {
         "type": "object",
@@ -293,6 +424,19 @@
         "additionalProperties": false,
         "properties": {
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateTagCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newName": {
             "type": "string"
           }
         }

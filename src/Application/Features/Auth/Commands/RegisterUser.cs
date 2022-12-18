@@ -52,11 +52,11 @@ namespace LyricsApp.Application.Features.Auth.Commands
 
     public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, IResult>
     {
-        private readonly ApiDbContext Context;
+        private readonly ApiDbContext _context;
 
         public RegisterUserHandler(ApiDbContext context)
         {
-            Context = context;
+            _context = context;
         }
 
         public async Task<IResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -66,9 +66,9 @@ namespace LyricsApp.Application.Features.Auth.Commands
                 string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
                 var newUser = new User(0, request.Name,request.Email, passwordHash, request.PhoneNumber);
                 
-                Context.Users.Add(newUser);
+                _context.Users.Add(newUser);
 
-                await Context.SaveChangesAsync(cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return Results.CreatedAtRoute(nameof(RegisterUser), new { newUser.Id },
                     new BasicResponse<User>(true, "Usuario creado correctamente", newUser));
