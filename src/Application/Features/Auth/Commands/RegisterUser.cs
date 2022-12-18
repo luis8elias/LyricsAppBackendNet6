@@ -79,7 +79,7 @@ namespace LyricsApp.Application.Features.Auth.Commands
             }
             catch (Exception)
             {
-                return Results.BadRequest(new BasicResponse<int?>(false, "Usuario no creado", null));
+                return Results.BadRequest(new BasicResponse<User?>(false, "Usuario no creado", null));
 
             }
         }
