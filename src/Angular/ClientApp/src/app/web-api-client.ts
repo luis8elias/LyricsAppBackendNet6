@@ -19,6 +19,7 @@ export interface IClient {
     getTagById(id: number): Observable<BasicResponseOfTag>;
     getTags(): Observable<BasicResponseOfListOfGetTagsResponse>;
     createTag(command: CreateTagCommand): Observable<BasicResponseOfInteger>;
+    deleteTag(tagId: number): Observable<BasicResponse_1>;
     registerUser(command: RegisterUserCommand): Observable<BasicResponseOfUser>;
 }
 
@@ -191,6 +192,65 @@ export class Client implements IClient {
             }));
         }
         return _observableOf<BasicResponseOfInteger>(null as any);
+    }
+
+    deleteTag(tagId: number): Observable<BasicResponse_1> {
+        let url_ = this.baseUrl + "/api/tags/{tagId}";
+        if (tagId === undefined || tagId === null)
+            throw new Error("The parameter 'tagId' must be defined.");
+        url_ = url_.replace("{tagId}", encodeURIComponent("" + tagId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteTag(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteTag(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BasicResponse_1>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BasicResponse_1>;
+        }));
+    }
+
+    protected processDeleteTag(response: HttpResponseBase): Observable<BasicResponse_1> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BasicResponse_1.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<BasicResponse_1>(null as any);
     }
 
     registerUser(command: RegisterUserCommand): Observable<BasicResponseOfUser> {
@@ -628,6 +688,80 @@ export class CreateTagCommand implements ICreateTagCommand {
 
 export interface ICreateTagCommand {
     name?: string;
+}
+
+export class BasicResponse_1 implements IBasicResponse_1 {
+    success?: boolean;
+    message?: string | undefined;
+    data?: T | undefined;
+
+    constructor(data?: IBasicResponse_1) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.success = _data["Success"];
+            this.message = _data["Message"];
+            this.data = _data["Data"] ? T.fromJS(_data["Data"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): BasicResponse_1 {
+        data = typeof data === 'object' ? data : {};
+        let result = new BasicResponse_1();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["Success"] = this.success;
+        data["Message"] = this.message;
+        data["Data"] = this.data ? this.data.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IBasicResponse_1 {
+    success?: boolean;
+    message?: string | undefined;
+    data?: T | undefined;
+}
+
+export class T implements IT {
+
+    constructor(data?: IT) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): T {
+        data = typeof data === 'object' ? data : {};
+        let result = new T();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data;
+    }
+}
+
+export interface IT {
 }
 
 export class BasicResponseOfUser implements IBasicResponseOfUser {

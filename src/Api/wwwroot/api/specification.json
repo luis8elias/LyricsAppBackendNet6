@@ -99,6 +99,44 @@
         }
       }
     },
+    "/api/tags/{tagId}": {
+      "delete": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "DeleteTag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponse_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/auth/register-user": {
       "post": {
         "tags": [
@@ -296,6 +334,31 @@
             "type": "string"
           }
         }
+      },
+      "BasicResponse_1": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Data": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/T"
+              }
+            ]
+          }
+        }
+      },
+      "T": {
+        "type": "object",
+        "additionalProperties": false
       },
       "BasicResponseOfUser": {
         "type": "object",
