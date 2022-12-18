@@ -22,6 +22,7 @@ public class ApiDbContext : DbContext
     }
 
     public DbSet<Tag> Tags => Set<Tag>();
+    public DbSet<User> Users => Set<User>();
 
     public async Task BeginTransactionAsync()
     {

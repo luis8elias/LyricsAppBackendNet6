@@ -1,10 +1,8 @@
 ﻿using Carter;
-using Carter.ModelBinding;
 using FluentValidation;
 using LyricsApp.Application.Common.Filters;
 using LyricsApp.Application.Common.Models;
 using LyricsApp.Application.Domain.Entities;
-using LyricsApp.Application.Features.Categories.Queries;
 using LyricsApp.Application.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
