@@ -1,55 +1,56 @@
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Carter;
 using LyricsApp.Application.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using LyricsApp.Application.Domain.Entities;
 using LyricsApp.Application.Common.Models;
 
-namespace LyricsApp.Application.Features.Categories.Queries;
+namespace LyricsApp.Application.Features.Tags.Queries;
 
 public class GetTagById : ICarterModule
 
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/tags/{id}", (int id, IMediator mediator) =>
+        app.MapGet("api/tags/{tagId}", (IMediator mediator ,int tagId) =>
         {
-            return mediator.Send(new GetTagByIdQuery(id));
+            return mediator.Send(new GetTagByIdQuery(tagId));
         })
         .WithName(nameof(GetTagById))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
+        .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
         .WithTags(nameof(Tag));
     }
 
-    public record GetTagByIdQuery(int Id) : IRequest<BasicResponse<Tag>>;
+    public record GetTagByIdQuery(int TagId) : IRequest<IResult>;
 
-    public class GetTagByIdHandler : IRequestHandler<GetTagByIdQuery, BasicResponse<Tag>>
+    public class GetTagByIdHandler : IRequestHandler<GetTagByIdQuery, IResult>
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
-        public GetTagByIdHandler(ApiDbContext context, IMapper mapper)
+        public GetTagByIdHandler(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<BasicResponse<Tag>> Handle(GetTagByIdQuery request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(GetTagByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var tag = await _context.Tags.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
-                return new BasicResponse<Tag>(true, "Tag Detail", tag);
+                var tag = await _context.Tags.FindAsync(request.TagId);
+
+                if (tag is null)
+                {
+                    return Results.NotFound(new BasicResponse<Tag?>(false, "Tag no encontrado", null));
+                }
+                return Results.Ok(new BasicResponse<Tag>(true, "Detalles del Tag", tag));
             }
             catch (Exception)
             {
 
-                throw;
+                return Results.Problem(statusCode: StatusCodes.Status500InternalServerError);
             }
 
         }
