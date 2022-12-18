@@ -21,6 +21,7 @@ public class GetTagById : ICarterModule
         .WithName(nameof(GetTagById))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
+        .Produces(StatusCodes.Status500InternalServerError)
         .WithTags(nameof(Tag));
     }
 

@@ -44,6 +44,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": ""
           }
         }
       },
@@ -107,6 +110,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": ""
           }
         }
       },
@@ -121,7 +127,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetTagByIdQuery"
+                "$ref": "#/components/schemas/CreateTagCommand"
               }
             }
           },
@@ -145,6 +151,53 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BasicResponseOfInteger"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tag"
+        ],
+        "operationId": "UpdateTag",
+        "requestBody": {
+          "x-name": "command",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicResponseOfTag"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -366,11 +419,24 @@
           }
         }
       },
-      "GetTagByIdQuery": {
+      "CreateTagCommand": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateTagCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tagId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newName": {
             "type": "string"
           }
         }

@@ -19,7 +19,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
         public void AddRoutes(IEndpointRouteBuilder app)
         {
 
-            app.MapPost("api/tags", async (GetTagByIdQuery command, IMediator mediator) =>
+            app.MapPost("api/tags", async (CreateTagCommand command, IMediator mediator) =>
             {
                 return await mediator.Send(command);
             })
@@ -30,17 +30,17 @@ namespace LyricsApp.Application.Features.Tags.Commands
                 StatusCodes.Status201Created,
                 typeof(BasicResponse<int>)
             )
-            .AddEndpointFilter<ValidationFilter<GetTagByIdQuery>>();
+            .AddEndpointFilter<ValidationFilter<CreateTagCommand>>();
         }
     }
 
-    public class GetTagByIdQuery : IRequest<IResult>
+    public class CreateTagCommand : IRequest<IResult>
     {
         public string Name { get; set; } = string.Empty;
 
     }
 
-    public class CreateTagValidator : AbstractValidator<GetTagByIdQuery>
+    public class CreateTagValidator : AbstractValidator<CreateTagCommand>
     {
         public CreateTagValidator()
         {
@@ -48,18 +48,18 @@ namespace LyricsApp.Application.Features.Tags.Commands
         }
     }
 
-    public class CreateTagHandler : IRequestHandler<GetTagByIdQuery, IResult>
+    public class CreateTagHandler : IRequestHandler<CreateTagCommand, IResult>
     {
         private readonly ApiDbContext _context;
-        private readonly IValidator<GetTagByIdQuery> _validator;
+        private readonly IValidator<CreateTagCommand> _validator;
 
-        public CreateTagHandler(ApiDbContext context, IValidator<GetTagByIdQuery> validator)
+        public CreateTagHandler(ApiDbContext context, IValidator<CreateTagCommand> validator)
         {
             _context = context;
             _validator = validator;
         }
 
-        public async Task<IResult> Handle(GetTagByIdQuery request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(CreateTagCommand request, CancellationToken cancellationToken)
         {
             try
             {
