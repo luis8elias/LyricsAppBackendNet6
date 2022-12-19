@@ -1,4 +1,6 @@
 ﻿
+using LyricsApp.Application.Features.Tags.Commands;
+
 namespace LyricsApp.Application.Domain.Entities
 {
     public class Tag
@@ -11,5 +13,6 @@ namespace LyricsApp.Application.Domain.Entities
 
         public int Id { get; set; }
         public string Name { get; set; }
+
     }
 }

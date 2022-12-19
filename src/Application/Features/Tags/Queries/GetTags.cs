@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using LyricsApp.Application.Domain.Entities;
 using LyricsApp.Application.Common.Models;
 
-namespace LyricsApp.Application.Features.Categories.Queries;
+namespace LyricsApp.Application.Features.Tags.Queries;
 
 public class GetTags : ICarterModule
 
@@ -23,16 +23,17 @@ public class GetTags : ICarterModule
         })
         .WithName(nameof(GetTags))
         .Produces(StatusCodes.Status200OK,typeof(BasicResponse<List<GetTagsResponse>>))
+        .Produces(StatusCodes.Status500InternalServerError)
         .WithTags(nameof(Tag))
         .RequireAuthorization();
     }
 
-    public class GetTagsQuery : IRequest<BasicResponse<List<GetTagsResponse>>>
+    public class GetTagsQuery : IRequest<IResult>
     {
 
     }
 
-    public class GetTagsHandler : IRequestHandler<GetTagsQuery, BasicResponse<List<GetTagsResponse>>>
+    public class GetTagsHandler : IRequestHandler<GetTagsQuery, IResult>
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
@@ -43,17 +44,17 @@ public class GetTags : ICarterModule
             _mapper = mapper;
         }
 
-        public async Task<BasicResponse<List<GetTagsResponse>>> Handle(GetTagsQuery request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(GetTagsQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var tagsList = await _context.Tags.ProjectTo<GetTagsResponse>(_mapper.ConfigurationProvider).ToListAsync();
-                return new BasicResponse<List<GetTagsResponse>>(true, "Listado de Tags", tagsList);
+                return Results.Ok(new BasicResponse<List<GetTagsResponse>>(true, "Listado de Tags", tagsList));
             }
             catch (Exception)
             {
 
-                return new BasicResponse<List<GetTagsResponse>>(false, "No se pudo obtener el listado de Tags", null);
+                return Results.Problem(statusCode: StatusCodes.Status500InternalServerError);
             }
 
         }
