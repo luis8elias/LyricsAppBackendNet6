@@ -23,7 +23,8 @@ public class GetTagById : ICarterModule
         })
         .WithName(nameof(GetTagById))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
-        .WithTags(nameof(Tag));
+        .WithTags(nameof(Tag))
+        .RequireAuthorization();
     }
 
     public record GetTagByIdQuery(int Id) : IRequest<BasicResponse<Tag>>;

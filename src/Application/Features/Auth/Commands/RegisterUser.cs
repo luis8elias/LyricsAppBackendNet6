@@ -27,7 +27,7 @@ namespace LyricsApp.Application.Features.Auth.Commands
                 StatusCodes.Status201Created,
                 typeof(BasicResponse<User>)
             )
-            .AddEndpointFilter<ValidationFilter<RegisterUserCommand>>(); ;
+            .AddEndpointFilter<ValidationFilter<RegisterUserCommand>>();
         }
     }
 

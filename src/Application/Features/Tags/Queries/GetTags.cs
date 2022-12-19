@@ -23,7 +23,8 @@ public class GetTags : ICarterModule
         })
         .WithName(nameof(GetTags))
         .Produces(StatusCodes.Status200OK,typeof(BasicResponse<List<GetTagsResponse>>))
-        .WithTags(nameof(Tag));
+        .WithTags(nameof(Tag))
+        .RequireAuthorization();
     }
 
     public class GetTagsQuery : IRequest<BasicResponse<List<GetTagsResponse>>>
