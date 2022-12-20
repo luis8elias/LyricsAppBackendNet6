@@ -30,7 +30,8 @@ namespace LyricsApp.Application.Features.Tags.Commands
                 StatusCodes.Status201Created,
                 typeof(BasicResponse<int>)
             )
-            .AddEndpointFilter<ValidationFilter<CreateTagCommand>>();
+            .AddEndpointFilter<ValidationFilter<CreateTagCommand>>()
+            .RequireAuthorization();
         }
     }
 

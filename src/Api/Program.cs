@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.AddSerilog();
 
+builder.Services.AddJwt(builder.Configuration);
+
 builder.Services.AddCustomCors();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddSwagger();
@@ -20,6 +22,8 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(Application));
 var app = builder.Build();
 
 app.UseCors(AppConstants.CorsPolicy);
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.MapSwagger();
 app.MapCarter();

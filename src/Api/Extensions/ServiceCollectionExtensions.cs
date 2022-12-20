@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using LyricsApp.Application.Common.Behaviours;
 using LyricsApp.Application.Helpers;
 using LyricsApp.Application.Infrastructure.Persistence;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 
 namespace LyricsApp.Api.Extensions;
 
@@ -15,7 +20,20 @@ public static class ServiceCollectionExtensions
         {
             c.Title = "LyricsApp APIs";
             c.Version = "v1";
+
+            c.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+             {
+                 Type = OpenApiSecuritySchemeType.ApiKey,
+                 Name = "Authorization",
+                 In = OpenApiSecurityApiKeyLocation.Header,
+                 Description = "Type into the textbox: Bearer {your JWT token}."
+             });
+
+            c.OperationProcessors.Add(
+                new AspNetCoreOperationSecurityScopeProcessor("JWT"));
         });
+
+
 
         return services;
     }
@@ -47,6 +65,27 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(typeof(Application.Application));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehaviour<,>));
 
+        return services;
+    }
+
+    public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHttpContextAccessor()
+        .AddAuthorization()
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["Jwt:Issuer"],
+                ValidAudience = configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+            };
+        });
         return services;
     }
 }

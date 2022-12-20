@@ -22,7 +22,8 @@ public class GetTagById : ICarterModule
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
         .Produces(StatusCodes.Status500InternalServerError)
-        .WithTags(nameof(Tag));
+        .WithTags(nameof(Tag))
+        .RequireAuthorization();
     }
 
     public record GetTagByIdQuery(int TagId) : IRequest<IResult>;
