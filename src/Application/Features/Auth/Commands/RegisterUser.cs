@@ -64,7 +64,7 @@ namespace LyricsApp.Application.Features.Auth.Commands
             try
             {
                 string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-                var newUser = new User(0, request.Name,request.Email, passwordHash, request.PhoneNumber);
+                var newUser = new User(request.Name,request.Email, passwordHash, request.PhoneNumber);
                 
                 _context.Users.Add(newUser);
 

@@ -18,9 +18,10 @@ builder.Services.AddCarter();
 builder.Services.AddAutoMapper(typeof(Application));
 builder.Services.AddMediator();
 builder.Services.AddValidatorsFromAssemblyContaining(typeof(Application));
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
-
+app.DbInitialize();
 app.UseCors(AppConstants.CorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
