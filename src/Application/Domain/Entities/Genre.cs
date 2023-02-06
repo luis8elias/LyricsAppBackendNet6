@@ -4,7 +4,7 @@ namespace LyricsApp.Application.Domain.Entities;
 
 public class Genre : EntityTracking
 {
-    private Genre() { }
+    protected Genre() { }
 
     public Genre(string name)
     {

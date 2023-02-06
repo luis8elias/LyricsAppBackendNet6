@@ -1,5 +1,6 @@
 using LyricsApp.Application.Domain;
 using LyricsApp.Application.Domain.Base;
+using LyricsApp.Application.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,13 +12,14 @@ public partial class ApiDbContext : DbContext
 {
     private readonly IPublisher _publisher;
     private readonly ILogger<ApiDbContext> _logger;
+    private readonly IHttpContextService httpContextService;
     private IDbContextTransaction? _currentTransaction;
 
-    public ApiDbContext(DbContextOptions<ApiDbContext> options, IPublisher publisher, ILogger<ApiDbContext> logger) : base(options)
+    public ApiDbContext(DbContextOptions<ApiDbContext> options, IPublisher publisher, ILogger<ApiDbContext> logger, IHttpContextService httpContextService) : base(options)
     {
         _publisher = publisher;
         _logger = logger;
-
+        this.httpContextService = httpContextService;
         _logger.LogDebug("DbContext created.");
     }
 
@@ -86,21 +88,29 @@ public partial class ApiDbContext : DbContext
                 .Entries()
                 .Where(e => e.Entity is IEntityTracking && (
                         e.State == EntityState.Added
-                        || e.State == EntityState.Modified));
+                        || e.State == EntityState.Modified
+                        || e.State == EntityState.Deleted));
 
         foreach (var entityEntry in entries)
         {
+            var userId = httpContextService.UserId;
+
+            if (entityEntry.State == EntityState.Deleted)
+            {
+                ((IEntityTracking)entityEntry.Entity).IsRemoved = true;
+                entityEntry.State = EntityState.Modified;
+            }
 
             if (entityEntry.State == EntityState.Modified)
             {
                 ((IEntityTracking)entityEntry.Entity).UpdatedAt = DateTime.Now;
-                // ((IEntityTracking)entityEntry.Entity).UpdatedBy = currentUserId;
+                ((IEntityTracking)entityEntry.Entity).UpdatedBy = userId;
             }
 
             if (entityEntry.State == EntityState.Added)
             {
                 ((IEntityTracking)entityEntry.Entity).CreatedAt = DateTime.Now;
-                // ((IEntityTracking)entityEntry.Entity).CreatedBy = currentUserId;
+                ((IEntityTracking)entityEntry.Entity).CreatedBy = userId;
             }
         }
     }
@@ -130,7 +140,7 @@ public partial class ApiDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
+        builder.ApplyGlobalFilters<bool>("IsRemoved", false);
         builder.ApplyConfigurationsFromAssembly(typeof(ApiDbContext).Assembly);
     }
 

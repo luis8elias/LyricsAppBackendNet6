@@ -1,7 +1,4 @@
-﻿
-using LyricsApp.Application.Features.Tags.Commands;
-
-namespace LyricsApp.Application.Domain.Entities
+﻿namespace LyricsApp.Application.Domain.Entities
 {
     public class Tag
     {
