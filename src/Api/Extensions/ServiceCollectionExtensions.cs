@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using NSwag;
 using NSwag.Generation.Processors.Security;
+using LyricsApp.Application.Infrastructure.Seeds;
 
 namespace LyricsApp.Api.Extensions;
 
@@ -86,6 +87,13 @@ public static class ServiceCollectionExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
             };
         });
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
+        services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
+
         return services;
     }
 }

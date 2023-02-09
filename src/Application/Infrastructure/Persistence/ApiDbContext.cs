@@ -9,6 +9,12 @@ namespace LyricsApp.Application.Infrastructure.Persistence;
 
 public partial class ApiDbContext : DbContext
 {
-    public DbSet<Tag> Tags => Set<Tag>();
-    public DbSet<User> Users => Set<User>();
+    public DbSet<Tag> Tags { get; set;}
+    public DbSet<User> Users { get; set; }
+
+    public DbSet<Genre> Genres { get; set; }
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<GroupAssignment> GroupAssignments { get; set; }
+    public DbSet<Song> Songs { get; set; }
+
 }
