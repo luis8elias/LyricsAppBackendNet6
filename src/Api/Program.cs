@@ -22,7 +22,7 @@ builder.Services.AddCarter();
 builder.Services.AddAutoMapper(typeof(Application));
 builder.Services.AddMediator();
 builder.Services.AddValidatorsFromAssemblyContaining(typeof(Application));
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Configuration);
 
 
 
