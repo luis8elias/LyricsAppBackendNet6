@@ -6,9 +6,12 @@ using LyricsApp.Application.Infrastructure.Persistence;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using LyricsApp.Application.Common.Configurations;
+using LyricsApp.Application.Domain.Interfaces;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using LyricsApp.Application.Infrastructure.Seeds;
+using LyricsApp.Application.Services;
 
 namespace LyricsApp.Api.Extensions;
 
@@ -90,9 +93,15 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
+
+        var emailConfig = configuration
+            .GetSection("EmailConfiguration")
+            .Get<EmailConfiguration>();
+        services.AddSingleton(emailConfig);
+        services.AddScoped<IEmailSender, EmailSenderService>();
 
         return services;
     }
