@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# IDE0058: El valor de la expresión no se utiliza nunca.
+csharp_style_unused_value_expression_statement_preference = unused_local_variable
+
+# CS8618: Un campo que no acepta valores NULL debe contener un valor distinto de NULL al salir del constructor. Considere la posibilidad de declararlo como que admite un valor NULL.
+dotnet_diagnostic.CS8618.severity = silent
