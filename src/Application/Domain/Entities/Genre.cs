@@ -14,5 +14,10 @@ public class Genre : EntityTracking
     public Guid Id { get; private set; }
     public string Name { get; private set; }
 
+    public void UpdateName(string name)
+    {
+        Name = name;
+    }
+
     public ICollection<Song> Songs { get; private set; }
 }
