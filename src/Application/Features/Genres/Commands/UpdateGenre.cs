@@ -19,9 +19,9 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("api/genre/{genreId}", (IMediator mediator, Guid genreId, [FromBody] string newName) =>
+            app.MapPut("api/genre/{genreId}", (IMediator mediator, Guid genreId, [FromBody] NamedBodyParameter request) =>
             {
-                return mediator.Send(new UpdateGenreCommand(genreId, newName));
+                return mediator.Send(new UpdateGenreCommand(genreId, request.newName));
             })
             .WithName(nameof(UpdateGenre))
             .WithTags(nameof(Genre))
@@ -31,23 +31,15 @@ namespace LyricsApp.Application.Features.Genres.Commands
                 typeof(BasicResponse<GenreResponse?>)
             )
             .Produces(StatusCodes.Status500InternalServerError)
-            .ProducesValidationProblem()
-            .AddEndpointFilter<ValidationFilter<UpdateGenreCommand>>();
+            .ProducesValidationProblem();
 
         }
     }
 
+    public record NamedBodyParameter(string newName);
     public record UpdateGenreCommand(Guid genreId, string newName) : IRequest<IResult>;
 
    
-    public class UpdateGenreValidator : AbstractValidator<UpdateGenreCommand>
-    {
-        public UpdateGenreValidator()
-        {
-            RuleFor(r => r.genreId).NotEmpty().NotNull();
-            RuleFor(r => r.newName).NotEmpty().NotNull();
-        }
-    }
 
     public class UpdateGenreHandler : IRequestHandler<UpdateGenreCommand, IResult>
     {
