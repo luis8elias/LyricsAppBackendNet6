@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Carter;
 using FluentValidation;
-using LyricsApp.Application.Common.Filters;
 using LyricsApp.Application.Common.Models;
 using LyricsApp.Application.Domain.Entities;
 using LyricsApp.Application.Infrastructure.Persistence;
