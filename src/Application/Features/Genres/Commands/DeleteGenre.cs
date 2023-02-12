@@ -15,7 +15,7 @@ namespace LyricsApp.Application.Features.Genres.Commands
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("api/genre/{genreId}", async (IMediator mediator, string genreId) =>
+            app.MapDelete("api/genre/{genreId}", async (IMediator mediator, Guid genreId) =>
             {
                 return await mediator.Send(new DeleteGenreCommand(genreId));
             })
@@ -29,9 +29,9 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
     public class DeleteGenreCommand : IRequest<IResult>
     {
-        public DeleteGenreCommand(string genreId) => GenreId = genreId;
+        public DeleteGenreCommand(Guid genreId) => GenreId = genreId;
 
-        public string GenreId { get; set; }
+        public Guid GenreId { get; set; }
     }
 
     public class DeleteGenreHandler : IRequestHandler<DeleteGenreCommand, IResult>
@@ -47,8 +47,8 @@ namespace LyricsApp.Application.Features.Genres.Commands
         {
             try
             {
-                var genreGuid = Guid.Parse(request.GenreId);
-                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == genreGuid);
+                
+                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == request.GenreId);
 
                 if (genre is null)
                 {

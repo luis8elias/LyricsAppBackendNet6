@@ -4,11 +4,11 @@ using FluentValidation;
 using LyricsApp.Application.Common.Filters;
 using LyricsApp.Application.Common.Models;
 using LyricsApp.Application.Domain.Entities;
-using LyricsApp.Application.Features.Tags.Commands;
 using LyricsApp.Application.Infrastructure.Persistence;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,9 +19,9 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("api/genres", async (UpdateGenreCommand command, IMediator mediator) =>
+            app.MapPut("api/genre/{genreId}", (IMediator mediator, Guid genreId, [FromBody] string newName) =>
             {
-                return await mediator.Send(command);
+                return mediator.Send(new UpdateGenreCommand(genreId, newName));
             })
             .WithName(nameof(UpdateGenre))
             .WithTags(nameof(Genre))
@@ -37,19 +37,15 @@ namespace LyricsApp.Application.Features.Genres.Commands
         }
     }
 
-    public class UpdateGenreCommand : IRequest<IResult>
-    {
+    public record UpdateGenreCommand(Guid genreId, string newName) : IRequest<IResult>;
 
-        public string GenreId { get; set; }
-        public string NewName { get; set; } = string.Empty;
-    }
-
+   
     public class UpdateGenreValidator : AbstractValidator<UpdateGenreCommand>
     {
         public UpdateGenreValidator()
         {
-            RuleFor(r => r.GenreId).NotEmpty().NotNull();
-            RuleFor(r => r.NewName).NotEmpty().NotNull();
+            RuleFor(r => r.genreId).NotEmpty().NotNull();
+            RuleFor(r => r.newName).NotEmpty().NotNull();
         }
     }
 
@@ -70,14 +66,13 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
             try
             {
-                var genreGuid = Guid.Parse(request.GenreId);
-                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == genreGuid);
+                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == request.genreId);
 
                 if (genre is null)
                 {
                     return Results.NotFound(new BasicResponse<GenreResponse?>(false, "Género no encontrado", null));
                 }
-                genre.Name = request.NewName;
+                genre.UpdateName(request.newName);
                 await _context.SaveChangesAsync();
                 var genreDetails = _mapper.Map<GenreResponse>(genre);
 
