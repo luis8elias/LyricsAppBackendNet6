@@ -22,7 +22,7 @@ public class GetGenres : ICarterModule
             return mediator.Send(new GetGenreQuery());
         })
         .WithName(nameof(GetGenres))
-        .Produces(StatusCodes.Status200OK,typeof(BasicResponse<List<GetGenreResponse>>))
+        .Produces(StatusCodes.Status200OK,typeof(BasicResponse<List<GenreResponse>>))
         .Produces(StatusCodes.Status500InternalServerError)
         .WithTags(nameof(Genre))
         .RequireAuthorization();
@@ -48,8 +48,8 @@ public class GetGenres : ICarterModule
         {
             try
             {
-                var genreList = await _context.Genres.ProjectTo<GetGenreResponse>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken: cancellationToken);
-                return Results.Ok(new BasicResponse<List<GetGenreResponse>>(true, "Genres list", genreList));
+                var genreList = await _context.Genres.ProjectTo<GenreResponse>(_mapper.ConfigurationProvider).ToListAsync(cancellationToken: cancellationToken);
+                return Results.Ok(new BasicResponse<List<GenreResponse>>(true, "Genres list", genreList));
             }
             catch (Exception)
             {
@@ -59,15 +59,5 @@ public class GetGenres : ICarterModule
 
         }
     }
-
-    public class GetGenreResponse
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class GetGenresMappingProfile : Profile
-    {
-        public GetGenresMappingProfile() => CreateMap<Genre, GetGenreResponse>();
-    }
+  
 }
