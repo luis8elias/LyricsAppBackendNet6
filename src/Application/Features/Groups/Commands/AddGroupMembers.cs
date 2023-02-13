@@ -17,7 +17,7 @@ public class AddGroupMembers : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/groups/{id}", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) =>
+        app.MapPost("api/groups/{id}/Members", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) =>
         {
             return mediator.Send(new AddGroupMemberRequest(id, members));
         })
