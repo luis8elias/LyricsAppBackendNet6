@@ -13,7 +13,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("api/tags/{tagId}", async (IMediator mediator, int tagId) => await mediator.Send(new DeleteTagCommand(tagId)))
+            app.MapDelete("api/tags/{tagId}", async (IMediator mediator, Guid tagId) => await mediator.Send(new DeleteTagCommand(tagId)))
             .WithName(nameof(DeleteTag))
             .WithTags(nameof(Tag))
             .Produces(StatusCodes.Status200OK, typeof(BasicResponse<>))
@@ -24,9 +24,9 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
     public class DeleteTagCommand : IRequest<IResult>
     {
-        public DeleteTagCommand(int tagId) => TagId = tagId;
+        public DeleteTagCommand(Guid tagId) => TagId = tagId;
 
-        public int TagId { get; set; }
+        public Guid TagId { get; set; }
     }
 
     public class DeleteProductHandler : IRequestHandler<DeleteTagCommand, IResult>

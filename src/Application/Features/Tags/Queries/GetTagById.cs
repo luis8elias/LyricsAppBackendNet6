@@ -14,7 +14,7 @@ public class GetTagById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/tags/{tagId}", (IMediator mediator, int tagId) => mediator.Send(new GetTagByIdQuery(tagId)))
+        app.MapGet("api/tags/{tagId}", (IMediator mediator, Guid tagId) => mediator.Send(new GetTagByIdQuery(tagId)))
         .WithName(nameof(GetTagById))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -23,7 +23,7 @@ public class GetTagById : ICarterModule
         .RequireAuthorization();
     }
 
-    public record GetTagByIdQuery(int TagId) : IRequest<IResult>;
+    public record GetTagByIdQuery(Guid TagId) : IRequest<IResult>;
 
     public class GetTagByIdHandler : IRequestHandler<GetTagByIdQuery, IResult>
     {
@@ -56,7 +56,7 @@ public class GetTagById : ICarterModule
 
     public class GetTagByIdResponse
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string? Name { get; set; }
     }
 }
