@@ -16,10 +16,7 @@ namespace LyricsApp.Application.Features.Genres.Queries
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("api/genres/{genreId}", (IMediator mediator, string genreId) =>
-            {
-                return mediator.Send(new GetGenreByIdQuery(genreId));
-            })
+            app.MapGet("api/genres/{genreId}", (IMediator mediator, string genreId) => mediator.Send(new GetGenreByIdQuery(genreId)))
             .WithName(nameof(GetGenreById))
             .Produces(StatusCodes.Status200OK, typeof(BasicResponse<GenreResponse>))
             .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -28,7 +25,7 @@ namespace LyricsApp.Application.Features.Genres.Queries
             .RequireAuthorization();
         }
 
-        public record GetGenreByIdQuery(string genreId) : IRequest<IResult>;
+        public record GetGenreByIdQuery(string GenreId) : IRequest<IResult>;
 
         public class GetGenreByIdHandler : IRequestHandler<GetGenreByIdQuery, IResult>
         {
@@ -45,8 +42,8 @@ namespace LyricsApp.Application.Features.Genres.Queries
             {
                 try
                 {
-                    var genreGuid = Guid.Parse(request.genreId);
-                    var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == genreGuid);
+                    var genreGuid = Guid.Parse(request.GenreId);
+                    var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == genreGuid, cancellationToken: cancellationToken);
                     if (genre is null)
                     {
                         return Results.NotFound(new BasicResponse<GenreResponse?>(false, "Género no encontrado", null));
@@ -56,14 +53,10 @@ namespace LyricsApp.Application.Features.Genres.Queries
                 }
                 catch (Exception)
                 {
-
                     return Results.Problem(statusCode: StatusCodes.Status500InternalServerError);
                 }
 
             }
         }
-
-       
     }
-
 }

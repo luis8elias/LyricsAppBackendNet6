@@ -33,18 +33,18 @@ public record DeleteGroupRequest(Guid Id) : IRequest<IResult>;
 
 public class DeleteGroupHandler : IRequestHandler<DeleteGroupRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IHttpContextService httpContextService;
+    private readonly ApiDbContext _context;
+    private readonly IHttpContextService _httpContextService;
 
     public DeleteGroupHandler(ApiDbContext context, IHttpContextService httpContextService)
     {
-        this.context = context;
-        this.httpContextService = httpContextService;
+        this._context = context;
+        this._httpContextService = httpContextService;
     }
 
     public async Task<IResult> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
     {
-        var group = await context.Groups
+        var group = await _context.Groups
         .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (group == null)
@@ -52,13 +52,13 @@ public class DeleteGroupHandler : IRequestHandler<DeleteGroupRequest, IResult>
             return Results.NotFound(new BasicResponse<GroupDetailResponse>(false, "The group does not exits", null));
         }
 
-        if (group.AdminId != httpContextService.UserId)
+        if (group.AdminId != _httpContextService.UserId)
         {
             return Results.BadRequest(new BasicResponse<GroupDetailResponse>(false, "Only admin can add delete the group", null));
         }
 
-        context.Groups.Remove(group);
-        context.SaveChanges();
+        _context.Groups.Remove(group);
+        _context.SaveChanges();
 
         return Results.Ok(new BasicResponse<GroupDetailResponse>(true, "The group was removed successfully", null));
     }

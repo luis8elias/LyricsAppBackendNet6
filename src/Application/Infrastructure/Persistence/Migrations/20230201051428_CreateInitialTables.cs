@@ -22,10 +22,7 @@ namespace LyricsApp.Application.Infrastructure.Persistence.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Genres", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_Genres", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "Users",

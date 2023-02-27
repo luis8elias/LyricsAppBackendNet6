@@ -18,10 +18,7 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("api/genre/{genreId}", (IMediator mediator, Guid genreId, [FromBody] NamedBodyParameter request) =>
-            {
-                return mediator.Send(new UpdateGenreCommand(genreId, request.newName));
-            })
+            app.MapPut("api/genre/{genreId}", (IMediator mediator, Guid genreId, [FromBody] NamedBodyParameter request) => mediator.Send(new UpdateGenreCommand(genreId, request.NewName)))
             .WithName(nameof(UpdateGenre))
             .WithTags(nameof(Genre))
             .Produces(StatusCodes.Status404NotFound)
@@ -35,10 +32,8 @@ namespace LyricsApp.Application.Features.Genres.Commands
         }
     }
 
-    public record NamedBodyParameter(string newName);
-    public record UpdateGenreCommand(Guid genreId, string newName) : IRequest<IResult>;
-
-   
+    public record NamedBodyParameter(string NewName);
+    public record UpdateGenreCommand(Guid GenreId, string NewName) : IRequest<IResult>;
 
     public class UpdateGenreHandler : IRequestHandler<UpdateGenreCommand, IResult>
     {
@@ -57,14 +52,14 @@ namespace LyricsApp.Application.Features.Genres.Commands
 
             try
             {
-                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == request.genreId);
+                var genre = await _context.Genres.FirstOrDefaultAsync(genre => genre.Id == request.GenreId, cancellationToken: cancellationToken);
 
                 if (genre is null)
                 {
                     return Results.NotFound(new BasicResponse<GenreResponse?>(false, "Género no encontrado", null));
                 }
-                genre.UpdateName(request.newName);
-                await _context.SaveChangesAsync();
+                genre.UpdateName(request.NewName);
+                await _context.SaveChangesAsync(cancellationToken);
                 var genreDetails = _mapper.Map<GenreResponse>(genre);
 
                 return Results.Ok(new BasicResponse<GenreResponse>(true, "Género actualizado", genreDetails));

@@ -17,10 +17,7 @@ public class AddGroupMembers : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/groups/{id}/Members", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) =>
-        {
-            return mediator.Send(new AddGroupMemberRequest(id, members));
-        })
+        app.MapPost("api/groups/{id}/Members", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) => mediator.Send(new AddGroupMemberRequest(id, members)))
         .WithName(nameof(AddGroupMembers))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<GroupDetailResponse>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -35,20 +32,20 @@ public record AddGroupMemberRequest(Guid GroupId, IList<Guid> Members) : IReques
 
 public class AddGroupMembersHandler : IRequestHandler<AddGroupMemberRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IMapper mapper;
-    private readonly IHttpContextService httpContextService;
+    private readonly ApiDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly IHttpContextService _httpContextService;
 
     public AddGroupMembersHandler(ApiDbContext context, IMapper mapper, IHttpContextService httpContextService)
     {
-        this.context = context;
-        this.mapper = mapper;
-        this.httpContextService = httpContextService;
+        _context = context;
+        _mapper = mapper;
+        _httpContextService = httpContextService;
     }
 
     public async Task<IResult> Handle(AddGroupMemberRequest request, CancellationToken cancellationToken)
     {
-        var group = await context.Groups
+        var group = await _context.Groups
         .Include(i => i.Members)
         .FirstOrDefaultAsync(x => x.Id == request.GroupId, cancellationToken);
 
@@ -57,35 +54,35 @@ public class AddGroupMembersHandler : IRequestHandler<AddGroupMemberRequest, IRe
             return Results.NotFound(new BasicResponse<GroupDetailResponse>(false, "Group not found", null));
         }
 
-        if(group.AdminId != httpContextService.UserId)
+        if(group.AdminId != _httpContextService.UserId)
         {
             return Results.BadRequest(new BasicResponse<GroupDetailResponse>(false, "Only admin can add members", null));
         }
 
-        var NewMembers = new List<GroupAssignment>();
+        var newMembers = new List<GroupAssignment>();
 
         foreach (var item in request.Members)
         {
             var newMember = new GroupAssignment(group.Id, item);
             if (!group.Members.Any(x => x.UserId == item))
-                NewMembers.Add(newMember);
+                newMembers.Add(newMember);
         }
 
-        if (NewMembers.Count == 0)
+        if (newMembers.Count == 0)
         {
             return Results.BadRequest(new BasicResponse<GroupDetailResponse>(false, "The members are already added", null));
         }
 
-        await context.GroupAssignments.AddRangeAsync(NewMembers, cancellationToken);
+        await _context.GroupAssignments.AddRangeAsync(newMembers, cancellationToken);
 
-        context.SaveChanges();
+        _context.SaveChanges();
 
-        group = await context.Groups
+        group = await _context.Groups
                 .Include(i => i.Members)
                 .ThenInclude(i => i.User)
                 .FirstOrDefaultAsync(x => x.Id == request.GroupId, cancellationToken);
 
-        var groupDetails = mapper.Map<GroupDetailResponse>(group);
+        var groupDetails = _mapper.Map<GroupDetailResponse>(group);
 
         return Results.Ok(new BasicResponse<GroupDetailResponse>(true, "Group details", groupDetails));
     }

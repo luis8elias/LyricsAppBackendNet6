@@ -16,10 +16,7 @@ public class CreateGroup : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/groups", async (CreateGroupRequest command, IMediator mediator) =>
-           {
-               return await mediator.Send(command);
-           })
+        app.MapPost("api/groups", async (CreateGroupRequest command, IMediator mediator) => await mediator.Send(command))
            .WithName(nameof(CreateGroup))
            .WithTags(nameof(Domain.Entities.Group))
            .ProducesValidationProblem()
@@ -44,23 +41,23 @@ public class CreateGroupRequestValidator : AbstractValidator<CreateGroupRequest>
 
 public class CreateGroupHandler : IRequestHandler<CreateGroupRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IHttpContextService httpContextService;
-    private readonly IMapper mapper;
+    private readonly ApiDbContext _context;
+    private readonly IHttpContextService _httpContextService;
+    private readonly IMapper _mapper;
 
     public CreateGroupHandler(ApiDbContext context, IHttpContextService httpContextService, IMapper mapper)
     {
-        this.context = context;
-        this.httpContextService = httpContextService;
-        this.mapper = mapper;
+        _context = context;
+        _httpContextService = httpContextService;
+        _mapper = mapper;
     }
 
     public async Task<IResult> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
     {
-        var group = new Domain.Entities.Group(request.Name, httpContextService.UserId);
-        context.Groups.Add(group);
-        await context.SaveChangesAsync(cancellationToken);
-        var result = mapper.Map<GroupResponse>(group);
+        var group = new Domain.Entities.Group(request.Name, _httpContextService.UserId);
+        _context.Groups.Add(group);
+        await _context.SaveChangesAsync(cancellationToken);
+        var result = _mapper.Map<GroupResponse>(group);
 
         return Results.CreatedAtRoute(nameof(CreateGroup), new { group.Id },
                   new BasicResponse<GroupResponse>(true, "Group successfully created", result));

@@ -53,7 +53,6 @@ namespace LyricsApp.Application.Features.Tags.Commands
     public class UpdateTagHandler : IRequestHandler<UpdateTagCommand, IResult>
     {
         private readonly ApiDbContext _context;
-        
 
         public UpdateTagHandler(ApiDbContext context )
         {
@@ -62,10 +61,9 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
         public async Task<IResult> Handle(UpdateTagCommand request, CancellationToken cancellationToken)
         {
-
             try
             {
-                var tag = await _context.Tags.FindAsync(request.TagId);
+                var tag = await _context.Tags.FindAsync(new object?[] { request.TagId }, cancellationToken: cancellationToken);
 
                 if (tag is null)
                 {
@@ -74,7 +72,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
 
                 tag.Name= request.NewName;
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return Results.Ok(new BasicResponse<Tag>(true, "Tag actualizado", tag));
 
@@ -85,5 +83,4 @@ namespace LyricsApp.Application.Features.Tags.Commands
             }
         }
     }
-
 }

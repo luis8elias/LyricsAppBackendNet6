@@ -16,10 +16,7 @@ namespace LyricsApp.Application.Features.Auth.Commands
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("auth/register-user", async (RegisterUserCommand command, IMediator mediator) =>
-            {
-                return await mediator.Send(command);
-            })
+            app.MapPost("auth/register-user", async (RegisterUserCommand command, IMediator mediator) => await mediator.Send(command))
             .WithName(nameof(RegisterUser))
             .WithTags("Auth")
             .ProducesValidationProblem()

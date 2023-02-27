@@ -40,18 +40,18 @@ public class GetGroupByIdRequestValidator : AbstractValidator<GetGroupByIdReques
 
 public class GetGroupByIdHandler : IRequestHandler<GetGroupByIdRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IMapper mapper;
+    private readonly ApiDbContext _context;
+    private readonly IMapper _mapper;
 
     public GetGroupByIdHandler(ApiDbContext context, IMapper mapper)
     {
-        this.context = context;
-        this.mapper = mapper;
+        _context = context;
+        _mapper = mapper;
     }
 
     public async Task<IResult> Handle(GetGroupByIdRequest request, CancellationToken cancellationToken)
     {
-        var group = await context.Groups
+        var group = await _context.Groups
         .Include(i => i.Members)
         .ThenInclude(i => i.User)
         .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
@@ -61,7 +61,7 @@ public class GetGroupByIdHandler : IRequestHandler<GetGroupByIdRequest, IResult>
             return Results.NotFound(new BasicResponse<GroupDetailResponse>(false, "Group details not found", null));
         }
 
-        var groupDetails = mapper.Map<GroupDetailResponse>(group);
+        var groupDetails = _mapper.Map<GroupDetailResponse>(group);
 
         return Results.Ok(new BasicResponse<GroupDetailResponse>(true, "Group details", groupDetails));
 

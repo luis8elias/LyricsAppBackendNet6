@@ -18,10 +18,7 @@ namespace LyricsApp.Application.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_Tags", x => x.Id));
         }
 
         /// <inheritdoc />

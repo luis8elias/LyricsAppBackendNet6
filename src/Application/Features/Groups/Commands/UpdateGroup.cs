@@ -17,10 +17,7 @@ public class UpdateGroup : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("api/groups/{id}", (IMediator mediator, Guid id, [FromBody] UpdateGroupName req) =>
-        {
-            return mediator.Send(new UpdateGroupRequest(id, req.newName));
-        })
+        app.MapPut("api/groups/{id}", (IMediator mediator, Guid id, [FromBody] UpdateGroupName req) => mediator.Send(new UpdateGroupRequest(id, req.NewName)))
         .WithName(nameof(UpdateGroup))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<GroupResponse>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -33,42 +30,42 @@ public class UpdateGroup : ICarterModule
 
 public record UpdateGroupRequest(Guid Id, string Name) : IRequest<IResult>;
 
-public record UpdateGroupName(string newName);
+public record UpdateGroupName(string NewName);
 
 
 public class UpdateGroupHandler : IRequestHandler<UpdateGroupRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IMapper mapper;
-    private readonly IHttpContextService httpContextService;
+    private readonly ApiDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly IHttpContextService _httpContextService;
 
     public UpdateGroupHandler(ApiDbContext context, IMapper mapper, IHttpContextService httpContextService)
     {
-        this.context = context;
-        this.mapper = mapper;
-        this.httpContextService = httpContextService;
+        this._context = context;
+        this._mapper = mapper;
+        this._httpContextService = httpContextService;
     }
 
     public async Task<IResult> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
     {
-        var group = await context.Groups.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        var group = await _context.Groups.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (group == null)
         {
             return Results.NotFound(new BasicResponse<GroupResponse>(false, "The group does not exits", null));
         }
 
-        if (group.AdminId != httpContextService.UserId)
+        if (group.AdminId != _httpContextService.UserId)
         {
             return Results.BadRequest(new BasicResponse<GroupResponse>(false, "Only admin can add update the group", null));
         }
 
         group.UpdateName(request.Name);
 
-        context.Groups.Update(group);
-        context.SaveChanges();
+        _context.Groups.Update(group);
+        _context.SaveChanges();
 
-        var result = mapper.Map<GroupResponse>(group);
+        var result = _mapper.Map<GroupResponse>(group);
 
         return Results.Ok(new BasicResponse<GroupResponse>(true, "Group updated", result));
     }
