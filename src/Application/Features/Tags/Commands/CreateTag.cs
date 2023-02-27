@@ -64,7 +64,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
         {
             try
             {
-                var newTag = new Tag(0, request.Name);
+                var newTag = new Tag( Guid.NewGuid(), request.Name);
                 
                 _context.Tags.Add(newTag);
 

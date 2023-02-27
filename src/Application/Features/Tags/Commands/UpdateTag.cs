@@ -37,7 +37,7 @@ namespace LyricsApp.Application.Features.Tags.Commands
     public class UpdateTagCommand : IRequest<IResult>
     {
 
-        public int TagId { get; set; }
+        public Guid TagId { get; set; }
         public string NewName { get; set; } = string.Empty;
     }
 
