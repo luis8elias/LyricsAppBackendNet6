@@ -21,10 +21,7 @@ public class Login : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/Login", async ([FromBody]LoginRequest request, IMediator mediator) => 
-        {
-            return await mediator.Send(request);
-        })
+        app.MapPost("auth/Login", async ([FromBody] LoginRequest request, IMediator mediator) => await mediator.Send(request))
         .WithName(nameof(Login))
         .WithTags("Auth")
         .ProducesValidationProblem()
@@ -48,17 +45,17 @@ public class Login : ICarterModule
 
     public class LoginHandler : IRequestHandler<LoginRequest, IResult>
     {
-        private readonly ApiDbContext context;
-        private readonly IConfiguration config;
+        private readonly ApiDbContext _context;
+        private readonly IConfiguration _config;
 
         public LoginHandler(ApiDbContext context, IConfiguration config){
-            this.context = context;
-            this.config = config;
+            _context = context;
+            _config = config;
         }
 
         public async Task<IResult> Handle(LoginRequest request, CancellationToken cancellationToken)
         {
-            var user = await context.Users.FirstOrDefaultAsync(x =>x.Email == request.Username, cancellationToken: cancellationToken);
+            var user = await _context.Users.FirstOrDefaultAsync(x =>x.Email == request.Username, cancellationToken: cancellationToken);
 
             if(user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password)){
                 return Results.BadRequest(new BasicResponse<string>(false, "Error","Username and/or Password are invalid"));
@@ -71,11 +68,11 @@ public class Login : ICarterModule
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new JwtSecurityToken(
-                issuer: config["Jwt:Issuer"],
-                audience: config["Jwt:Audience"],
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: credentials);

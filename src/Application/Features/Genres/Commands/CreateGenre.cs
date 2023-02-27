@@ -19,10 +19,7 @@ namespace LyricsApp.Application.Features.Genres.Commands
         public void AddRoutes(IEndpointRouteBuilder app)
         {
 
-            app.MapPost("api/genres", async (CreateGenreCommand command, IMediator mediator) =>
-            {
-                return await mediator.Send(command);
-            })
+            app.MapPost("api/genres", async (CreateGenreCommand command, IMediator mediator) => await mediator.Send(command))
             .WithName(nameof(CreateGenre))
             .WithTags(nameof(Genre))
             .ProducesValidationProblem()

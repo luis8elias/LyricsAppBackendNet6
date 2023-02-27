@@ -6,12 +6,12 @@ namespace LyricsApp.Application.Infrastructure.Seeds;
 
 public class DatabaseInitializer : IDatabaseInitializer
 {
-    private readonly ApiDbContext context;
-    private Guid AdminId;
+    private readonly ApiDbContext _context;
+    private Guid _adminId;
 
     public DatabaseInitializer(ApiDbContext context)
     {
-        this.context = context;
+        _context = context;
         context.Database.Migrate();
     }
 
@@ -24,24 +24,24 @@ public class DatabaseInitializer : IDatabaseInitializer
 
     private void SeedUsers()
     {
-        var adminUser = context.Users.FirstOrDefault(x => x.Email == "admin@lyrics.com");
+        var adminUser = _context.Users.FirstOrDefault(x => x.Email == "admin@lyrics.com");
         if (adminUser == null)
         {
             var password = BCrypt.Net.BCrypt.HashPassword("admin123");
             var user = new User("AdminUser", "admin@lyrics.com", password, null);
-            AdminId = user.Id;
-            context.Users.Add(user);
-            context.SaveChanges();
+            _adminId = user.Id;
+            _context.Users.Add(user);
+            _context.SaveChanges();
         }
         else
         {
-            AdminId = adminUser.Id;
+            _adminId = adminUser.Id;
         }
     }
 
     private void SeedGenres()
     {
-        if (!context.Genres.Any())
+        if (!_context.Genres.Any())
         {
             var genres = new List<Genre> {
                 new Genre("Balada"),
@@ -54,22 +54,22 @@ public class DatabaseInitializer : IDatabaseInitializer
                 new Genre("Romántica")
             };
 
-            context.Genres.AddRange(genres);
-            context.SaveChanges();
+            _context.Genres.AddRange(genres);
+            _context.SaveChanges();
         }
     }
 
     private void SeedGroups()
     {
-        if (!context.Groups.Any())
+        if (!_context.Groups.Any())
         {
             var groups = new List<Group>()
             {
-                new Group("Tutys de la Sierra", AdminId),
+                new Group("Tutys de la Sierra", _adminId),
             };
 
-            context.Groups.AddRange(groups);
-            context.SaveChanges();
+            _context.Groups.AddRange(groups);
+            _context.SaveChanges();
         }
     }
 }

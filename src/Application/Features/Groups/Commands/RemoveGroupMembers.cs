@@ -16,10 +16,7 @@ public class RemoveGroupMembers : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        _ = app.MapDelete("api/groups/{id}/Members", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) =>
-        {
-            return mediator.Send(new RemoveGroupMembersRequest(id, members));
-        })
+        _ = app.MapDelete("api/groups/{id}/Members", (IMediator mediator, Guid id, [FromBody] IList<Guid> members) => mediator.Send(new RemoveGroupMembersRequest(id, members)))
         .WithName(nameof(RemoveGroupMembers))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<GroupDetailResponse>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -35,18 +32,18 @@ public record RemoveGroupMembersRequest(Guid GroupId, IList<Guid> Members) : IRe
 
 public class RemoveGroupMembersHandler : IRequestHandler<RemoveGroupMembersRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IHttpContextService httpContextService;
+    private readonly ApiDbContext _context;
+    private readonly IHttpContextService _httpContextService;
 
     public RemoveGroupMembersHandler(ApiDbContext context, IHttpContextService httpContextService)
     {
-        this.context = context;
-        this.httpContextService = httpContextService;
+        _context = context;
+        _httpContextService = httpContextService;
     }
 
     public async Task<IResult> Handle(RemoveGroupMembersRequest request, CancellationToken cancellationToken)
     {
-        var group = await context.Groups
+        var group = await _context.Groups
         .Include(i => i.Members)
         .FirstOrDefaultAsync(x => x.Id == request.GroupId, cancellationToken);
 
@@ -55,16 +52,16 @@ public class RemoveGroupMembersHandler : IRequestHandler<RemoveGroupMembersReque
             return Results.NotFound(new BasicResponse<GroupDetailResponse>(false, "Group not found", null));
         }
 
-        if (group.AdminId != httpContextService.UserId)
+        if (group.AdminId != _httpContextService.UserId)
         {
             return Results.BadRequest(new BasicResponse<GroupDetailResponse>(false, "Only admin can remove members", null));
         }
 
-        var removeMembers = context.GroupAssignments.Where(x => x.GroupId == request.GroupId && request.Members.Contains(x.UserId)).ToList();
+        var removeMembers = _context.GroupAssignments.Where(x => x.GroupId == request.GroupId && request.Members.Contains(x.UserId)).ToList();
 
-        context.GroupAssignments.RemoveRange(removeMembers);
+        _context.GroupAssignments.RemoveRange(removeMembers);
 
-        await context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Results.Ok(new BasicResponse<GroupDetailResponse>(true, "The Members were removed", null));
     }

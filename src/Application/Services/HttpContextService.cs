@@ -6,26 +6,20 @@ namespace LyricsApp.Application.Services;
 
 public class HttpContextService : IHttpContextService
 {
-    private readonly IHttpContextAccessor contextAccessor;
+    private readonly IHttpContextAccessor _contextAccessor;
 
     public HttpContextService(IHttpContextAccessor contextAccessor)
     {
-        this.contextAccessor = contextAccessor;
+        _contextAccessor = contextAccessor;
     }
 
     public Guid UserId
     {
         get
         {
-            var userId = contextAccessor?.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Sid);
+            var userId = _contextAccessor?.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Sid);
 
-            if ( userId == null)
-            {
-                return Guid.Empty;
-            }
-
-            return new Guid(userId.Value);
-
+            return userId == null ? Guid.Empty : new Guid(userId.Value);
         }
     }
 }

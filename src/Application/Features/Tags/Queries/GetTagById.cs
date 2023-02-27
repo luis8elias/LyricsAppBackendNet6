@@ -14,10 +14,7 @@ public class GetTagById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("api/tags/{tagId}", (IMediator mediator ,int tagId) =>
-        {
-            return mediator.Send(new GetTagByIdQuery(tagId));
-        })
+        app.MapGet("api/tags/{tagId}", (IMediator mediator, int tagId) => mediator.Send(new GetTagByIdQuery(tagId)))
         .WithName(nameof(GetTagById))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<Tag>))
         .Produces(StatusCodes.Status404NotFound, typeof(BasicResponse<>))
@@ -41,7 +38,7 @@ public class GetTagById : ICarterModule
         {
             try
             {
-                var tag = await _context.Tags.FindAsync(request.TagId);
+                var tag = await _context.Tags.FindAsync(new object?[] { request.TagId }, cancellationToken: cancellationToken);
 
                 if (tag is null)
                 {
@@ -51,7 +48,6 @@ public class GetTagById : ICarterModule
             }
             catch (Exception)
             {
-
                 return Results.Problem(statusCode: StatusCodes.Status500InternalServerError);
             }
 

@@ -32,22 +32,22 @@ public record ListGroupsRequest() : IRequest<IResult>;
 
 public class ListGroupsHandler : IRequestHandler<ListGroupsRequest, IResult>
 {
-    private readonly ApiDbContext context;
-    private readonly IHttpContextService httpContextService;
-    private readonly IMapper mapper;
+    private readonly ApiDbContext _context;
+    private readonly IHttpContextService _httpContextService;
+    private readonly IMapper _mapper;
 
     public ListGroupsHandler(ApiDbContext context, IHttpContextService httpContextService, IMapper mapper)
     {
-        this.context = context;
-        this.httpContextService = httpContextService;
-        this.mapper = mapper;
+        _context = context;
+        _httpContextService = httpContextService;
+        _mapper = mapper;
     }
 
     public async Task<IResult> Handle(ListGroupsRequest request, CancellationToken cancellationToken)
     {
-        var userId = httpContextService.UserId;
-        var groups = await context.Groups.Where(x => x.AdminId == userId || x.Members.Any(m => m.UserId == userId))
-            .ProjectTo<GroupResponse>(mapper.ConfigurationProvider)
+        var userId = _httpContextService.UserId;
+        var groups = await _context.Groups.Where(x => x.AdminId == userId || x.Members.Any(m => m.UserId == userId))
+            .ProjectTo<GroupResponse>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken: cancellationToken);
 
         return Results.Ok(new BasicResponse<IEnumerable<GroupResponse>>(true, "Groups List", groups));

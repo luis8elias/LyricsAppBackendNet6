@@ -12,14 +12,17 @@ public partial class ApiDbContext : DbContext
 {
     private readonly IPublisher _publisher;
     private readonly ILogger<ApiDbContext> _logger;
-    private readonly IHttpContextService httpContextService;
+    private readonly IHttpContextService _httpContextService;
     private IDbContextTransaction? _currentTransaction;
 
-    public ApiDbContext(DbContextOptions<ApiDbContext> options, IPublisher publisher, ILogger<ApiDbContext> logger, IHttpContextService httpContextService) : base(options)
+    public ApiDbContext(DbContextOptions<ApiDbContext> options,
+                        IPublisher publisher,
+                        ILogger<ApiDbContext> logger,
+                        IHttpContextService httpContextService) : base(options)
     {
         _publisher = publisher;
         _logger = logger;
-        this.httpContextService = httpContextService;
+        _httpContextService = httpContextService;
         _logger.LogDebug("DbContext created.");
     }
 
@@ -43,7 +46,7 @@ public partial class ApiDbContext : DbContext
             return;
         }
 
-        _logger.LogInformation("Commiting Transaction {ID}", _currentTransaction.TransactionId);
+        _logger.LogInformation("Committing Transaction {ID}", _currentTransaction.TransactionId);
 
         await _currentTransaction.CommitAsync();
 
@@ -93,7 +96,7 @@ public partial class ApiDbContext : DbContext
 
         foreach (var entityEntry in entries)
         {
-            var userId = httpContextService.UserId;
+            var userId = _httpContextService.UserId;
 
             if (entityEntry.State == EntityState.Deleted)
             {
@@ -140,7 +143,7 @@ public partial class ApiDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.ApplyGlobalFilters<bool>("IsRemoved", false);
+        builder.ApplyGlobalFilters("IsRemoved", false);
         builder.ApplyConfigurationsFromAssembly(typeof(ApiDbContext).Assembly);
     }
 

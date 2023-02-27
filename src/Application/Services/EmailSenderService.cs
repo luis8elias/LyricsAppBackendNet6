@@ -9,11 +9,11 @@ namespace LyricsApp.Application.Services;
 
 public class EmailSenderService: IEmailSender {
 
-    private readonly EmailConfiguration emailConfiguration;
+    private readonly EmailConfiguration _emailConfiguration;
 
     public EmailSenderService(EmailConfiguration emailConfiguration)
     {
-        this.emailConfiguration = emailConfiguration;
+        this._emailConfiguration = emailConfiguration;
     }
 
     public void SendEmail(EmailMessage emailMessage)
@@ -26,7 +26,7 @@ public class EmailSenderService: IEmailSender {
     private MimeMessage CreateEmailMessage( EmailMessage emailMessage)
     {
         var mail = new MimeMessage();
-        mail.From.Add(new MailboxAddress(emailConfiguration.UserName, emailConfiguration.From));
+        mail.From.Add(new MailboxAddress(_emailConfiguration.UserName, _emailConfiguration.From));
         mail.To.AddRange(emailMessage.To.Select(x => new MailboxAddress(x, x)).ToList());
         mail.Subject = emailMessage.Subject;
         mail.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = emailMessage.Content };
@@ -38,8 +38,8 @@ public class EmailSenderService: IEmailSender {
         using var client = new SmtpClient();
         try
         {
-            client.Connect(emailConfiguration.SmtpServer, emailConfiguration.Port, SecureSocketOptions.StartTls);
-            client.Authenticate(emailConfiguration.From, emailConfiguration.Password);
+            client.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.Port, SecureSocketOptions.StartTls);
+            client.Authenticate(_emailConfiguration.From, _emailConfiguration.Password);
             client.Send(mailMessage);
         }
         catch(Exception ex)
