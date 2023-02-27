@@ -17,9 +17,9 @@ public class UpdateGroup : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("api/groups/{id}", (IMediator mediator, Guid id, [FromBody] string name) =>
+        app.MapPut("api/groups/{id}", (IMediator mediator, Guid id, [FromBody] UpdateGroupName req) =>
         {
-            return mediator.Send(new UpdateGroupRequest(id, name));
+            return mediator.Send(new UpdateGroupRequest(id, req.newName));
         })
         .WithName(nameof(UpdateGroup))
         .Produces(StatusCodes.Status200OK, typeof(BasicResponse<GroupResponse>))
@@ -32,6 +32,8 @@ public class UpdateGroup : ICarterModule
 }
 
 public record UpdateGroupRequest(Guid Id, string Name) : IRequest<IResult>;
+
+public record UpdateGroupName(string newName);
 
 
 public class UpdateGroupHandler : IRequestHandler<UpdateGroupRequest, IResult>
