@@ -40,11 +40,9 @@ public class GetTagById : ICarterModule
             {
                 var tag = await _context.Tags.FindAsync(new object?[] { request.TagId }, cancellationToken: cancellationToken);
 
-                if (tag is null)
-                {
-                    return Results.NotFound(new BasicResponse<Tag?>(false, "Tag no encontrado", null));
-                }
-                return Results.Ok(new BasicResponse<Tag>(true, "Detalles del Tag", tag));
+                return tag is null
+                    ? Results.NotFound(new BasicResponse<Tag?>(false, "Tag no encontrado", null))
+                    : Results.Ok(new BasicResponse<Tag>(true, "Detalles del Tag", tag));
             }
             catch (Exception)
             {
