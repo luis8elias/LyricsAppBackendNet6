@@ -10,6 +10,12 @@
             Name = name;
         }
 
+        public Tag(string name)
+        {
+            Id = Guid.NewGuid();
+            Name = name;
+        }
+
         public Guid Id { get; private set; }
         public string Name { get; set; }
 
