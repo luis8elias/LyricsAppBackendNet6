@@ -19,5 +19,5 @@ public class Genre : EntityTracking
         Name = name;
     }
 
-    public ICollection<Song> Songs { get; private set; }
+    public ICollection<Song> Songs { get; private set; } 
 }
