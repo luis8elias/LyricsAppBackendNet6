@@ -22,4 +22,16 @@ public class HttpContextService : IHttpContextService
             return userId == null ? Guid.Empty : new Guid(userId.Value);
         }
     }
+
+    public string? GetCookie(string key)
+    {
+        return _contextAccessor?.HttpContext?.Request.Cookies[key];
+    }
+
+    public void SetCookie(string key, string value, CookieOptions options)
+    {
+        _contextAccessor?.HttpContext?.Response.Cookies.Append(key, value, options);
+    }
+
+    
 }

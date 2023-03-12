@@ -72,8 +72,23 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddConfig(this IServiceCollection services, IConfiguration config)
+    {
+        JwtConfiguration jwtConfiguration = config.GetSection("Jwt").Get<JwtConfiguration>() ?? new ();
+        services.AddSingleton(jwtConfiguration);
+
+
+        EmailConfiguration emailConfiguration = config.GetSection("EmailConfiguration").Get<EmailConfiguration>() ?? new ();
+
+        services.AddSingleton(emailConfiguration);
+
+        return services;
+    }
+
     public static IServiceCollection AddJwt(this IServiceCollection services, IConfiguration configuration)
     {
+        JwtConfiguration jwt = configuration.GetSection("Jwt").Get<JwtConfiguration>() ?? new ();
+
         services.AddHttpContextAccessor()
         .AddAuthorization()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -83,22 +98,20 @@ public static class ServiceCollectionExtensions
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-            ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+            ValidIssuer = jwt.Issuer,
+            ValidAudience = jwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecurityKey))
         });
+
         return services;
     }
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
 
-        configuration
-            .GetSection("EmailConfiguration")
-            .Get<EmailConfiguration>();
-        services.AddSingleton<EmailConfiguration>();
         services.AddScoped<IEmailSender, EmailSenderService>();
+        services.AddTransient<IAuthService, AuthService>();
 
         return services;
     }

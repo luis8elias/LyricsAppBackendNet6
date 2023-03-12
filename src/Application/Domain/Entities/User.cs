@@ -19,6 +19,10 @@ namespace LyricsApp.Application.Domain.Entities
         public string Password { get; private set; }
         public string? PhoneNumber { get; set; }
 
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime RefreshTokenCreated { get; set; }
+        public DateTime RefreshTokenExpires { get; set; }
+
         public ICollection<GroupAssignment> Groups { get; private set; }
     }
 }
